@@ -6,7 +6,27 @@
 #    200:
 #      description: Retrieve all account information
 ###
-GET   /accounts                     controllers.AccountsController.list
+GET   /accounts                         controllers.AccountsController.list
+
+###
+#  summary: Retrieve single account
+#  tags:
+#  - accounts
+#  responses:
+#    200:
+#      description: Retrieve single account information
+###
+GET   /accounts/:id                     controllers.AccountsController.get(id: Long)
+
+###
+#  summary: Delete single account
+#  tags:
+#  - accounts
+#  responses:
+#    200:
+#      description: Delete single account
+###
+DELETE   /accounts/:id                 controllers.AccountsController.delete(id: Long)
 
 ###
 #  summary: Create account
@@ -18,7 +38,43 @@ GET   /accounts                     controllers.AccountsController.list
 #    200:
 #      description: Create a new account
 ###
-POST   /accounts                     controllers.AccountsController.create(balance: Long, currencyId: Option[Long])
+POST   /accounts                       controllers.AccountsController.create(balance: Long)
+
+###
+#  summary: Updates account
+#  tags:
+#  - accounts
+#  parameters:
+#   - name: body
+#  responses:
+#    200:
+#      description: Updates an existing account
+###
+PUT   /accounts                        controllers.AccountsController.create(balance: Long)
+
+###
+#  summary: Transfer balance from one account to another
+#  tags:
+#  - transfer
+#  parameters:
+#   - name: body
+#  responses:
+#    200:
+#      description: Balance transfer
+###
+POST   /transfer                        controllers.AccountsController.transfer(from: Long, to: Long, balance: Double)
+
+###
+#  summary: List all transfers
+#  tags:
+#  - transfer
+#  parameters:
+#   - name: body
+#  responses:
+#    200:
+#      description: All transfers
+###
+GET   /transfers                        controllers.AccountsController.list
 
 ### Swagger routes ###
 

@@ -25,17 +25,49 @@ class AccountsController @Inject() (
     accountsDao.list().map{ accounts => Ok(Json.toJson(accounts)) }
   }
 
-  /** Creates a [[models.Account]]
+  /** Retrieves a single [[models.Account]] based on id.
     *
-    * @param balance the account balance
-    * @param currencyId the currency id
-    * @return a JSON with a success/fail String message
+    * @return the [[models.Account]].
     */
-  def create(balance: Long, currencyId: Option[Long]) = Action.async { implicit request =>
-    accountsDao.create(balance, currencyId.getOrElse(1)).map {
-      case _ => Ok(Json.obj("message" -> s"Account created in currency id: ${currencyId} with balance: ${balance}"))
+  def get(id: Long) =  Action.async { implicit request =>
+    accountsDao.read(id).map{
+      case Some(account) => Ok(Json.toJson(account))
+      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} does not exist"))
     }
   }
 
+  /** Deletes a single [[models.Account]] based on id.
+    *
+    * @return a JSON with a success/fail message
+    */
+  def delete(id: Long) =  Action.async { implicit request =>
+    accountsDao.delete(id).map{
+      case 1 => Ok(Json.obj("message" -> s"Account with id: ${id} was deleted"))
+      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} was not found"))
+    }
+  }
+
+  /** Creates a [[models.Account]]
+    *
+    * @param balance the account balance
+    * @return a JSON with a success/fail message
+    */
+  def create(balance: Double) = Action.async { implicit request =>
+    accountsDao.insert(balance).map {
+      case account => Ok(Json.obj("message" -> s"Account #${account.id} created with balance: ${account.balance}"))
+    }
+  }
+
+
+  /** Transfers balances between accounts
+    *
+    * @param balance the account balance
+    * @return a JSON with a success/fail message
+    */
+  def transfer(from: Long, to: Long, balance: Double) = Action.async { implicit request =>
+    accountsDao.transfer(from, to, balance).map {
+      case _ => Ok(Json.obj("message" -> s"Transferred ${balance} from account #${from} to #${to}"))
+    }
+  }
 
 }

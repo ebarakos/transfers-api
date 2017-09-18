@@ -10,13 +10,12 @@ import play.api.libs.json.Json
   * The account model
   *
   * @param id the id of the account.
-  * @param currencyId the accepted currency
+  * @param balance the account balance
 
   */
 case class Account(
   id: Long,
-  balance: Long,
-  currencyId: Long
+  balance: Double
 )
 
 object Account {
