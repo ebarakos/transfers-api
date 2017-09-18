@@ -1,0 +1,12 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Transfers API",
+    "description": "Transfers API",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "produces": [
+    "application/json"
+  ]
+}

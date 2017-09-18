@@ -1,0 +1,32 @@
+###
+#  summary: List accounts
+#  tags:
+#  - accounts
+#  responses:
+#    200:
+#      description: Retrieve all account information
+###
+GET   /accounts                     controllers.AccountsController.list
+
+###
+#  summary: Create account
+#  tags:
+#  - accounts
+#  parameters:
+#   - name: body
+#  responses:
+#    200:
+#      description: Create a new account
+###
+POST   /accounts                     controllers.AccountsController.create(balance: Long, currencyId: Option[Long])
+
+### Swagger routes ###
+
+### NoDocs ###
+GET   /docs/swagger.json                modules.swagger.SwaggerController.specs
+
+### NoDocs ###
+GET   /                                 modules.swagger.SwaggerController.docs
+
+### NoDocs ###
+GET   /docs/swagger-ui/*file            controllers.Assets.at(path:String="/public/swagger-ui", file:String)
