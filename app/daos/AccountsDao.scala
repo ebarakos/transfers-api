@@ -73,11 +73,11 @@ class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseCo
 
 
   /**
-    * List all the accounts.
+    * Transfer balance from one account to another
     */
   def transfer(from: Long, to: Long, balance: Double): Future[Unit] =
     db.run((for {
-      _ <- accounts.filter(_.id === from).map(res => (res.balance)).update(to)
+      amountToRetrieve <- accounts.filter(_.id === from).map(res => (res.balance)).update(to)
       _ <- accounts.filter(_.id === to).map(res => (res.balance)).update(from)
     } yield ()).transactionally)
 }
