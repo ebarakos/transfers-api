@@ -71,13 +71,23 @@ class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseCo
     accounts.result
   }
 
-
   /**
     * Transfer balance from one account to another
     */
-  def transfer(from: Long, to: Long, balance: Double): Future[Unit] =
-    db.run((for {
-      amountToRetrieve <- accounts.filter(_.id === from).map(res => (res.balance)).update(to)
-      _ <- accounts.filter(_.id === to).map(res => (res.balance)).update(from)
-    } yield ()).transactionally)
+  def transfer(from: Long, to: Long, balance: Double): Future[Unit] = {
+    val atomicTransactionQuery = (for {
+      oldFromBalance <- accounts.filter(_.id === from).map(_.balance).result.headOption
+        .map(_.getOrElse(throw new Exception(s"Account #${from} does not exist")))
+      oldToBalance <- accounts.filter(_.id === to).map(_.balance).result.headOption
+        .map(_.getOrElse(throw new Exception(s"Account #${to} does not exist")))
+      newFromBalance = (oldFromBalance - balance).signum match {
+            case 1 => oldFromBalance - balance
+            case _ => throw new Exception(s"Insufficient balance on account #${from}")
+          }
+      newToBalance = oldToBalance + balance
+      _ <- accounts.filter(_.id === from).map(_.balance).update(newFromBalance)
+      _ <- accounts.filter(_.id === to).map(_.balance).update(newToBalance)
+    } yield ()).transactionally
+      db.run(atomicTransactionQuery)
+  }
 }

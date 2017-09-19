@@ -6,6 +6,7 @@ import daos.AccountsDao
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 
+import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -57,8 +58,7 @@ class AccountsController @Inject() (
       case account => Ok(Json.obj("message" -> s"Account #${account.id} created with balance: ${account.balance}"))
     }
   }
-
-
+        
   /** Transfers balances between accounts
     *
     * @param balance the account balance
@@ -67,7 +67,8 @@ class AccountsController @Inject() (
   def transfer(from: Long, to: Long, balance: Double) = Action.async { implicit request =>
     accountsDao.transfer(from, to, balance).map {
       case _ => Ok(Json.obj("message" -> s"Transferred ${balance} from account #${from} to #${to}"))
-    }
+    } recover {
+      case ex: Exception => Ok(Json.obj("message" -> s"Transfer not completed: ${ex.getMessage}"))}
   }
 
 }
