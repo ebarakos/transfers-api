@@ -26,7 +26,7 @@ GET   /accounts/:id                     controllers.AccountsController.get(id: L
 #    200:
 #      description: Delete single account
 ###
-DELETE   /accounts/:id                 controllers.AccountsController.delete(id: Long)
+DELETE   /accounts/:id                  controllers.AccountsController.delete(id: Long)
 
 ###
 #  summary: Create account
@@ -38,10 +38,10 @@ DELETE   /accounts/:id                 controllers.AccountsController.delete(id:
 #    200:
 #      description: Create a new account
 ###
-POST   /accounts                       controllers.AccountsController.create(balance: Long)
+POST   /accounts                        controllers.AccountsController.create(balance: Long)
 
 ###
-#  summary: Updates account
+#  summary: Update account
 #  tags:
 #  - accounts
 #  parameters:
@@ -50,31 +50,31 @@ POST   /accounts                       controllers.AccountsController.create(bal
 #    200:
 #      description: Updates an existing account
 ###
-PUT   /accounts                        controllers.AccountsController.create(balance: Long)
+PUT   /accounts                         controllers.AccountsController.update(id: Long, balance: Double)
 
 ###
-#  summary: Transfer balance from one account to another
+#  summary: Transfer amount between accounts
 #  tags:
-#  - transfer
+#  - transactions
 #  parameters:
 #   - name: body
 #  responses:
 #    200:
 #      description: Balance transfer
 ###
-POST   /transfer                        controllers.AccountsController.transfer(from: Long, to: Long, balance: Double)
+POST   /transactions                    controllers.AccountsController.transfer(from: Long, to: Long, amount: Double)
 
 ###
-#  summary: List all transfers
+#  summary: List all transactions
 #  tags:
-#  - transfer
+#  - transactions
 #  parameters:
 #   - name: body
 #  responses:
 #    200:
 #      description: All transfers
 ###
-GET   /transfers                        controllers.AccountsController.list
+GET   /transactions                     controllers.AccountsController.listTransactions
 
 ### Swagger routes ###
 

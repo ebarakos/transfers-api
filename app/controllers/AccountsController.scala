@@ -22,7 +22,7 @@ class AccountsController @Inject() (
     *
     * @return a JSON with the Seq of [[models.Account]].
     */
-  def list() =  Action.async { implicit request =>
+  def list() = Action.async { implicit request =>
     accountsDao.list().map{ accounts => Ok(Json.toJson(accounts)) }
   }
 
@@ -30,10 +30,22 @@ class AccountsController @Inject() (
     *
     * @return the [[models.Account]].
     */
-  def get(id: Long) =  Action.async { implicit request =>
+  def get(id: Long) = Action.async { implicit request =>
     accountsDao.read(id).map{
       case Some(account) => Ok(Json.toJson(account))
       case _ => Ok(Json.obj("message" -> s"Account with id: ${id} does not exist"))
+    }
+  }
+
+
+  /** Updates an [[models.Account]] balance based on id.
+    *
+    * @return a JSON with a success/fail message
+    */
+  def update(id: Long, balance: Double) = Action.async { implicit request =>
+    accountsDao.update(id, balance).map{
+      case 1 => Ok(Json.obj("message" -> s"Account with id: ${id} was updated with balance: ${balance}"))
+      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} was not found"))
     }
   }
 
@@ -41,7 +53,7 @@ class AccountsController @Inject() (
     *
     * @return a JSON with a success/fail message
     */
-  def delete(id: Long) =  Action.async { implicit request =>
+  def delete(id: Long) = Action.async { implicit request =>
     accountsDao.delete(id).map{
       case 1 => Ok(Json.obj("message" -> s"Account with id: ${id} was deleted"))
       case _ => Ok(Json.obj("message" -> s"Account with id: ${id} was not found"))
@@ -58,17 +70,27 @@ class AccountsController @Inject() (
       case account => Ok(Json.obj("message" -> s"Account #${account.id} created with balance: ${account.balance}"))
     }
   }
-        
+
   /** Transfers balances between accounts
     *
-    * @param balance the account balance
+    * @param from the account to transfer from
+    * @param to the account to transfer to
+    * @param amount the account balance
     * @return a JSON with a success/fail message
     */
-  def transfer(from: Long, to: Long, balance: Double) = Action.async { implicit request =>
-    accountsDao.transfer(from, to, balance).map {
-      case _ => Ok(Json.obj("message" -> s"Transferred ${balance} from account #${from} to #${to}"))
+  def transfer(from: Long, to: Long, amount: Double) = Action.async { implicit request =>
+    accountsDao.transfer(from, to, amount).map {
+      case t => Ok(Json.obj("message" -> s"Transferred ${t.amount} from account #${t.from} to #${t.to}. Transaction id: ${t.id}"))
     } recover {
-      case ex: Exception => Ok(Json.obj("message" -> s"Transfer not completed: ${ex.getMessage}"))}
+      case ex: Exception => Ok(Json.obj("message" -> s"Transfer not completed: ${ex.getMessage}"))
+    }
   }
 
+  /** Retrieves the list of all Transactions.
+    *
+    * @return a JSON with the Seq of [[models.Transaction]].
+    */
+  def listTransactions() = Action.async { implicit request =>
+    accountsDao.listTransactions().map{ transactions => Ok(Json.toJson(transactions)) }
+  }
 }
