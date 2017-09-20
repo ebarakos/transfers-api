@@ -2,8 +2,6 @@ name := """transfers-api"""
 
 scalaVersion := "2.11.7"
 
-credentials += Credentials(new File("./conf/nexus.credentials"))
-
 resolvers ++= Seq(
   Resolver.jcenterRepo
 )
