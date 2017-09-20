@@ -62,19 +62,17 @@ PUT   /accounts                         controllers.AccountsController.update(id
 #    200:
 #      description: Balance transfer
 ###
-POST   /transactions                    controllers.AccountsController.transfer(from: Long, to: Long, amount: Double)
+POST   /transactions                    controllers.TransactionsController.transfer(from: Long, to: Long, amount: Double)
 
 ###
 #  summary: List all transactions
 #  tags:
 #  - transactions
-#  parameters:
-#   - name: body
 #  responses:
 #    200:
 #      description: All transfers
 ###
-GET   /transactions                     controllers.AccountsController.listTransactions
+GET   /transactions                     controllers.TransactionsController.listTransactions
 
 ### Swagger routes ###
 

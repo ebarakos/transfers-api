@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Transfers API",
-    "description": "Transfers API",
+    "description": "A sample API to transfer balances between accounts",
     "version": "1.0.0"
   },
   "basePath": "/",

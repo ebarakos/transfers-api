@@ -6,6 +6,7 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.driver.H2Driver.api._
 import models._
+import modules.components.TableComponents._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,29 +16,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
   *
   */
 @Singleton
-class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseConfigProvider) extends HasDatabaseConfigProvider[JdbcProfile]{
-
-  private class AccountsTable(tag: Tag) extends Table[Account](tag, "accounts") {
-
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def balance = column[Double]("balance")
-
-    def * = (id, balance) <> ((Account.apply _).tupled, Account.unapply)
-  }
-
-  private val accounts = TableQuery[AccountsTable]
-
-  private class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transfers") {
-
-    def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
-    def from = column[Long]("from")
-    def to = column[Long]("to")
-    def amount = column[Double]("amount")
-
-    def * = (id, from, to, amount) <> ((Transaction.apply _).tupled, Transaction.unapply)
-  }
-
-  private val transactions = TableQuery[TransactionsTable]
+class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseConfigProvider)
+  extends AccountsComponent with HasDatabaseConfigProvider[JdbcProfile]{
 
   /**
     * Create an account with a balance and a certain currency.
@@ -75,39 +55,6 @@ class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseCo
     */
   def list(): Future[Seq[Account]] = db.run {
     accounts.result
-  }
-
-  /**
-    * Transfer amount from one account to another
-    */
-  def transfer(from: Long, to: Long, amount: Double): Future[Transaction] = {
-    val atomicTransactionQuery = (for {
-      oldFromBalance <- accounts.filter(_.id === from).map(_.balance).result.headOption
-        .map(_.getOrElse(throw new Exception(s"Account #${from} does not exist")))
-      oldToBalance <- accounts.filter(_.id === to).map(_.balance).result.headOption
-        .map(_.getOrElse(throw new Exception(s"Account #${to} does not exist")))
-      newFromBalance = (oldFromBalance - amount).signum match {
-        case -1 => throw new Exception(s"Insufficient balance: ${oldFromBalance} on account #${from}")
-        case _ => oldFromBalance - amount
-      }
-      newToBalance = oldToBalance + amount
-      _ <- accounts.filter(_.id === from).map(_.balance).update(newFromBalance)
-      _ <- accounts.filter(_.id === to).map(_.balance).update(newToBalance)
-      transaction <- (transactions returning transactions.map(_.id)
-        into ((transfer,id) => transfer.copy(id=id))
-        ) += Transaction(0, from, to, amount)
-    // .transactionally method is used to execute the above queries in a single transaction.
-    // This means that if any query fails, all prior operations will be rolled back,
-    // leaving the database in a consistent state.
-    } yield transaction).transactionally
-      db.run(atomicTransactionQuery)
-  }
-
-  /**
-    * List all the accounts.
-    */
-  def listTransactions(): Future[Seq[Transaction]] = db.run {
-    transactions.result
   }
 
 }

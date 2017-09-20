@@ -20,9 +20,6 @@ class AccountsControllerSpec extends PlaySpec with MockitoSugar {
     val account = new Account(1, 1000)
     val account2 = new Account(2, 2000)
     val accounts = Seq(account, account2)
-    val transaction = new Transaction(1, 1, 2, 200)
-    val transaction2 = new Transaction(2, 2, 1, 300)
-    val transactions = Seq(transaction, transaction2)
   }
 
   "list accounts" must {
@@ -88,26 +85,6 @@ class AccountsControllerSpec extends PlaySpec with MockitoSugar {
       val result = accountsControllers.delete(3)(FakeRequest())
       status(result) mustBe NOT_FOUND
       contentAsJson(result) mustBe Json.obj("message" -> s"Account with id: 3 does not exist")    }
-  }
-
-  "transfer amount" must {
-    "return 200 if from account has sufficient balance and both accounts exist" in new Context {
-      val from = 1
-      val to = 2
-      val amount = 200
-      when(accountsDao.transfer(from, to, amount)).thenReturn(Future.successful(transaction))
-      val result = accountsControllers.transfer(from, to, amount)(FakeRequest())
-      status(result) mustBe OK
-    }
-  }
-
-  "list transactions" must {
-    "return 200 and the list of transactions" in new Context {
-      when(accountsDao.listTransactions()).thenReturn(Future.successful(transactions))
-      val result = accountsControllers.listTransactions()(FakeRequest())
-      status(result) mustBe OK
-      contentAsJson(result) mustBe Json.toJson(transactions)
-    }
   }
 
 }
