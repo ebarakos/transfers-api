@@ -96,6 +96,9 @@ class AccountsDao @Inject() (protected implicit val dbConfigProvider: DatabaseCo
       transaction <- (transactions returning transactions.map(_.id)
         into ((transfer,id) => transfer.copy(id=id))
         ) += Transaction(0, from, to, amount)
+    // .transactionally method is used to execute the above queries in a single transaction.
+    // This means that if any query fails, all prior operations will be rolled back,
+    // leaving the database in a consistent state.
     } yield transaction).transactionally
       db.run(atomicTransactionQuery)
   }

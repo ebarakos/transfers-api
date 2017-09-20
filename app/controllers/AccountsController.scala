@@ -33,7 +33,7 @@ class AccountsController @Inject() (
   def get(id: Long) = Action.async { implicit request =>
     accountsDao.read(id).map{
       case Some(account) => Ok(Json.toJson(account))
-      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} does not exist"))
+      case _ => NotFound(Json.obj("message" -> s"Account with id: ${id} does not exist"))
     }
   }
 
@@ -45,7 +45,7 @@ class AccountsController @Inject() (
   def update(id: Long, balance: Double) = Action.async { implicit request =>
     accountsDao.update(id, balance).map{
       case 1 => Ok(Json.obj("message" -> s"Account with id: ${id} was updated with balance: ${balance}"))
-      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} was not found"))
+      case _ => NotFound(Json.obj("message" -> s"Account with id: ${id} does not exist"))
     }
   }
 
@@ -56,7 +56,7 @@ class AccountsController @Inject() (
   def delete(id: Long) = Action.async { implicit request =>
     accountsDao.delete(id).map{
       case 1 => Ok(Json.obj("message" -> s"Account with id: ${id} was deleted"))
-      case _ => Ok(Json.obj("message" -> s"Account with id: ${id} was not found"))
+      case _ => NotFound(Json.obj("message" -> s"Account with id: ${id} does not exist"))
     }
   }
 
@@ -82,7 +82,7 @@ class AccountsController @Inject() (
     accountsDao.transfer(from, to, amount).map {
       case t => Ok(Json.obj("message" -> s"Transferred ${t.amount} from account #${t.from} to #${t.to}. Transaction id: ${t.id}"))
     } recover {
-      case ex: Exception => Ok(Json.obj("message" -> s"Transfer not completed: ${ex.getMessage}"))
+      case ex: Exception => NotFound(Json.obj("message" -> s"Transfer not completed: ${ex.getMessage}"))
     }
   }
 
