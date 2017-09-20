@@ -19,5 +19,5 @@ case class Account(
 )
 
 object Account {
-  implicit val userJsonFormat = Json.format[Account]
+  implicit val accountJsonFormat = Json.format[Account]
 }

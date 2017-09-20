@@ -9,7 +9,6 @@ import models._
 import modules.components.TableComponents._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * The accounts DAO.

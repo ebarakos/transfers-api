@@ -18,7 +18,7 @@ object TableComponents {
   }
 
   trait TransactionsComponent {
-    protected class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transfers") {
+    protected class TransactionsTable(tag: Tag) extends Table[Transaction](tag, "transactions") {
       def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
       def from = column[Long]("from")
       def to = column[Long]("to")
